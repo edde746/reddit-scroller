@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import Header from '$lib/Header.svelte';
+  import { onMount } from 'svelte';
   import type { PageData } from './$types';
   import { inview } from 'svelte-inview';
 
@@ -14,6 +15,11 @@
   const inviewOptions = {
     rootMargin: '100px',
   };
+
+  let nsfwEnabled = false;
+  onMount(() => {
+    nsfwEnabled = localStorage.getItem('nsfw') === 'true';
+  });
 </script>
 
 <svelte:window
@@ -64,9 +70,23 @@
             class="w-full mb-4 relative block"
             style="aspect-ratio: {firstImage.width}/{firstImage.height}"
             href={post.originalUrl}
+            on:click={(e) => {
+              if (post.nsfw && !nsfwEnabled) {
+                nsfwEnabled = confirm('Do you wish to enable NSFW content?');
+                localStorage.setItem('nsfw', String(nsfwEnabled));
+                if (!nsfwEnabled) e.preventDefault();
+              }
+            }}
             target="_blank"
             rel="noopener noreferrer"
           >
+            {#if post.nsfw && !nsfwEnabled}
+              <div
+                class="absolute inset-0 backdrop-blur-lg z-20 flex items-center justify-center flex-col text-lg font-bold"
+              >
+                NSFW
+              </div>
+            {/if}
             <div class="absolute inset-0 bg-neutral-200 dark:bg-neutral-800" />
             {#if isPostInView}
               {#if ['mp4', 'mov'].includes(extension)}
