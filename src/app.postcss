@@ -1,4 +1,9 @@
-/* Write your global styles here, in PostCSS syntax */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    @apply dark:bg-neutral-900 dark:text-neutral-100;
+  }
+}
