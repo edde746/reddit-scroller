@@ -8,6 +8,7 @@ export const GET: RequestHandler = async ({ url, params }) => {
   const time = url.searchParams.get('time') || 'day';
 
   const redditUrl = new URL(`https://www.reddit.com/r/${subreddit}/${sort}.json`);
+  redditUrl.searchParams.set('limit', '30');
   if (after) redditUrl.searchParams.set('after', after);
   if (time) redditUrl.searchParams.set('t', time);
 
@@ -44,9 +45,9 @@ export const GET: RequestHandler = async ({ url, params }) => {
               return child.data.media.reddit_video.fallback_url;
             }
 
-            if (child.data.url.includes('youtube.com')) {
+            if (child.data.url.includes('youtube.com') || child.data.url.includes('youtu.be')) {
               // ignore for now
-              return '';
+              return null;
             }
 
             return child.data.url;

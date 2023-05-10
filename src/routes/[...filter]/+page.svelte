@@ -50,7 +50,7 @@
   <title>Discover top subreddits with rscroll.app</title>
   <meta
     name="description"
-    content="Effortlessly browse through the top 2000 subreddits with rscroll.app, your one-stop destination for viewing diverse content across a variety of communities."
+    content="Effortlessly browse through the top 2500 subreddits with rscroll.app, your one-stop destination for viewing diverse content across a variety of communities."
   />
 </svelte:head>
 

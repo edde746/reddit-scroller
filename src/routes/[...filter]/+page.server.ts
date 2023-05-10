@@ -33,7 +33,7 @@ export const load: PageServerLoad = async () => {
 
   let after = '';
   let subreddits = [] as Subreddit[];
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 25; i++) {
     const response = await fetch(`https://oauth.reddit.com/subreddits/popular.json?limit=100&after=${after}`, {
       headers: {
         Authorization: `Bearer ${auth.access_token}`,
@@ -60,7 +60,7 @@ export const load: PageServerLoad = async () => {
     }
   }
 
-  await redis.set('subreddits', JSON.stringify({ subreddits }), 'EX', 60 * 60 * 24 * 31);
+  await redis.set('subreddits', JSON.stringify({ subreddits }));
 
   return { subreddits };
 };

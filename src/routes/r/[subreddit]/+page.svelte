@@ -11,7 +11,8 @@
   let postsInView: string[] = [];
   let errored: string[] = [];
 
-  let loading = false;
+  let loading = false,
+    outOfPosts = false;
 
   const inviewOptions = {
     rootMargin: '100px',
@@ -21,11 +22,15 @@
   onMount(() => {
     nsfwEnabled = localStorage.getItem('nsfw') === 'true';
   });
+
+  $: postCount = data.children.flat().reduce((acc, cur) => {
+    return cur.preview?.images[0]?.source && cur.url && !errored.includes(cur.id) ? acc + 1 : acc;
+  }, 0);
 </script>
 
 <svelte:window
   on:scroll={() => {
-    if (loading) return;
+    if (loading || outOfPosts || postCount == 0) return;
     if (window.innerHeight * 1.5 + window.scrollY >= document.body.offsetHeight) {
       loading = true;
 
@@ -38,6 +43,7 @@
           data.children = [...data.children, ...res.children];
           data.after = res.after;
           loading = false;
+          if (!res.after || res.children.length === 0) outOfPosts = true;
         });
     }
   }}
@@ -143,4 +149,8 @@
       />
     </svg>
   </div>
+{/if}
+
+{#if outOfPosts || postCount == 0}
+  <div class="flex w-full justify-center my-5 text-lg">No more posts</div>
 {/if}
