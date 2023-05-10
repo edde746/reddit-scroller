@@ -36,22 +36,24 @@ export const GET: RequestHandler = async ({ url, params }) => {
           title: child.data.title,
           nsfw: child.data.over_18,
           preview: child.data.preview,
-          url: (() => {
-            if (child.data?.preview?.reddit_video_preview) {
-              return child.data.preview.reddit_video_preview.fallback_url;
-            }
+          media: child.data.media,
+          // url: (() => {
+          //   if (child.data?.preview?.reddit_video_preview) {
+          //     return child.data.preview.reddit_video_preview.fallback_url;
+          //   }
 
-            if (child.data?.media?.reddit_video) {
-              return child.data.media.reddit_video.fallback_url;
-            }
+          //   if (child.data?.media?.reddit_video) {
+          //     return child.data.media.reddit_video.fallback_url;
+          //   }
 
-            if (child.data.url.includes('youtube.com') || child.data.url.includes('youtu.be')) {
-              // ignore for now
-              return null;
-            }
+          //   if (child.data.url.includes('youtube.com') || child.data.url.includes('youtu.be')) {
+          //     // ignore for now
+          //     return null;
+          //   }
 
-            return child.data.url;
-          })(),
+          //   return child.data.url;
+          // })(),
+          url: child.data.url,
           originalUrl: child.data.url,
         })),
     ],

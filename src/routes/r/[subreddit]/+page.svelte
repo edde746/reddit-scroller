@@ -5,6 +5,7 @@
   import type { PageData } from './$types';
   import { inview } from 'svelte-inview';
   import Header from '$lib/Header.svelte';
+  import he from 'he';
 
   export let data: PageData;
 
@@ -26,6 +27,19 @@
   $: postCount = data.children.flat().reduce((acc, cur) => {
     return cur.preview?.images[0]?.source && cur.url && !errored.includes(cur.id) ? acc + 1 : acc;
   }, 0);
+
+  let mediaWidth = 0;
+
+  const findBestFittingImageUrl = (
+    imageVariations: { url: string; width: number; height: number }[],
+    elementWidth: number
+  ) => {
+    imageVariations.sort((a, b) => a.width - b.width);
+
+    const bestFit = imageVariations.find((variation) => variation.width >= elementWidth);
+
+    return he.decode(bestFit ? bestFit.url : imageVariations[imageVariations.length - 1].url);
+  };
 </script>
 
 <svelte:window
@@ -69,6 +83,7 @@
       {@const isPostInView = postsInView.includes(post.id)}
       <div
         class="break-inside-avoid"
+        bind:clientWidth={mediaWidth}
         use:inview={inviewOptions}
         on:inview_change={(event) => {
           if (event.detail.inView) {
@@ -79,7 +94,6 @@
         }}
       >
         {#if firstImage && post.url && !errored.includes(post.id)}
-          {@const extension = post.url.split('.').pop().split('?')[0].toLowerCase()}
           <a
             class="w-full mb-4 relative block"
             style="aspect-ratio: {firstImage.width}/{firstImage.height}"
@@ -103,12 +117,18 @@
             {/if}
             <div class="absolute inset-0 bg-neutral-200 dark:bg-neutral-800" />
             {#if isPostInView}
-              {#if ['mp4', 'mov'].includes(extension)}
+              {#if post.preview?.reddit_video_preview}
                 <!-- svelte-ignore a11y-media-has-caption -->
-                <video src={post.url} class="w-full mb-4 absolute inset-0 z-10" autoplay loop muted />
-              {:else}
+                <video
+                  src={post.preview.reddit_video_preview.fallback_url}
+                  class="w-full mb-4 absolute inset-0 z-10"
+                  autoplay
+                  loop
+                  muted
+                />
+              {:else if post.preview?.images[0]}
                 <img
-                  src={post.url}
+                  src={findBestFittingImageUrl(post.preview.images[0].resolutions, mediaWidth)}
                   alt={post.title}
                   class="w-full mb-4 absolute inset-0 z-10"
                   on:error={() => {
