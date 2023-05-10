@@ -97,7 +97,7 @@
           <a
             class="w-full mb-4 relative block"
             style="aspect-ratio: {firstImage.width}/{firstImage.height}"
-            href={post.originalUrl}
+            href={post.url}
             on:click={(e) => {
               if (post.nsfw && !nsfwEnabled) {
                 nsfwEnabled = confirm('Do you wish to enable NSFW content?');
@@ -117,20 +117,15 @@
             {/if}
             <div class="absolute inset-0 bg-neutral-200 dark:bg-neutral-800" />
             {#if isPostInView}
-              {#if post.preview?.reddit_video_preview}
-                <!-- svelte-ignore a11y-media-has-caption -->
-                <video
-                  src={post.preview.reddit_video_preview.fallback_url}
-                  class="w-full mb-4 absolute inset-0 z-10"
-                  autoplay
-                  loop
-                  muted
-                />
+              {#if post.media?.reddit_video}
+                <video src={post.media.reddit_video.fallback_url} class="media" autoplay loop muted />
+              {:else if post.preview?.reddit_video_preview}
+                <video src={post.preview.reddit_video_preview.fallback_url} class="media" autoplay loop muted />
               {:else if post.preview?.images[0]}
                 <img
                   src={findBestFittingImageUrl(post.preview.images[0].resolutions, mediaWidth)}
                   alt={post.title}
-                  class="w-full mb-4 absolute inset-0 z-10"
+                  class="media"
                   on:error={() => {
                     console.log('error', post.url);
                     errored = [...errored, post.id];
@@ -174,3 +169,9 @@
 {#if outOfPosts || postCount == 0}
   <div class="flex w-full justify-center my-5 text-lg">No more posts</div>
 {/if}
+
+<style>
+  .media {
+    @apply w-full mb-4 absolute inset-0 z-10;
+  }
+</style>
