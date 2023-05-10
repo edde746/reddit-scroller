@@ -6,6 +6,7 @@
   import { inview } from 'svelte-inview';
   import Header from '$lib/Header.svelte';
   import he from 'he';
+  import Spinner from '$lib/Spinner.svelte';
 
   export let data: PageData;
 
@@ -16,7 +17,8 @@
     outOfPosts = false;
 
   const inviewOptions = {
-    rootMargin: '100px',
+    rootMargin: '150% 0px',
+    threshold: 0,
   };
 
   let nsfwEnabled = false;
@@ -27,8 +29,6 @@
   $: postCount = data.children.flat().reduce((acc, cur) => {
     return cur.preview?.images[0]?.source && cur.url && !errored.includes(cur.id) ? acc + 1 : acc;
   }, 0);
-
-  let mediaWidth = 0;
 
   const findBestFittingImageUrl = (
     imageVariations: { url: string; width: number; height: number }[],
@@ -84,102 +84,102 @@
   <Sorting />
 </Header>
 
-{#each data.children as page, i}
-  <div class="md:columns-2 lg:columns-3 gap-4">
-    {#each page as post}
-      {@const firstImage = post.preview?.images[0]?.source}
-      {@const isPostInView = postsInView.includes(post.id)}
-      <div
-        class="break-inside-avoid"
-        bind:clientWidth={mediaWidth}
-        use:inview={inviewOptions}
-        on:inview_change={(event) => {
-          if (event.detail.inView) {
-            postsInView = [...postsInView, post.id];
-          } else {
-            postsInView = postsInView.filter((p) => p !== post.id);
-          }
-        }}
-      >
-        {#if firstImage && post.url && !errored.includes(post.id)}
-          <a
-            class="w-full mb-4 relative block"
-            style="aspect-ratio: {firstImage.width}/{firstImage.height}"
-            href={post.url}
-            on:click={(e) => {
-              if (post.nsfw && !nsfwEnabled) {
-                nsfwEnabled = confirm('Do you wish to enable NSFW content?');
-                localStorage.setItem('nsfw', String(nsfwEnabled));
-                e.preventDefault();
-              }
-            }}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {#if post.nsfw && !nsfwEnabled}
-              <div
-                class="absolute inset-0 backdrop-blur-lg z-20 flex items-center justify-center flex-col text-lg font-bold"
-              >
-                NSFW
-              </div>
-            {/if}
-            <div class="absolute inset-0 bg-neutral-200 dark:bg-neutral-800" />
-            {#if isPostInView}
-              {#if post.media?.reddit_video}
-                <video src={post.media.reddit_video.fallback_url} class="media" autoplay loop muted />
-              {:else if post.preview?.reddit_video_preview}
-                <video src={post.preview.reddit_video_preview.fallback_url} class="media" autoplay loop muted />
-              {:else if post.preview?.images[0]}
-                <img
-                  src={findBestFittingImageUrl(post.preview.images[0].resolutions, mediaWidth)}
-                  alt={post.title}
-                  class="media"
-                  on:error={() => {
-                    console.log('error', post.url);
-                    errored = [...errored, post.id];
-                  }}
-                />
-              {/if}
-            {/if}
-          </a>
-        {/if}
-      </div>
-    {/each}
+{#if $navigating}
+  <div class="flex w-full justify-center my-5">
+    <Spinner />
   </div>
+{:else}
+  {#each data.children as page, i}
+    <div class="md:columns-2 lg:columns-3 gap-4">
+      {#each page as post}
+        {@const firstImage = post.preview?.images[0]?.source}
+        {@const isPostInView = postsInView.includes(post.id)}
+        <div
+          class="media-container"
+          use:inview={inviewOptions}
+          on:inview_change={(event) => {
+            if (event.detail.inView) {
+              postsInView = [...postsInView, post.id];
+            } else {
+              postsInView = postsInView.filter((p) => p !== post.id);
+            }
+          }}
+        >
+          {#if firstImage && post.url && !errored.includes(post.id)}
+            <a
+              class="w-full mb-4 relative block"
+              style="aspect-ratio: {firstImage.width}/{firstImage.height}"
+              href={post.url}
+              on:click={(e) => {
+                if (post.nsfw && !nsfwEnabled) {
+                  nsfwEnabled = confirm('Do you wish to enable NSFW content?');
+                  localStorage.setItem('nsfw', String(nsfwEnabled));
+                  e.preventDefault();
+                }
+              }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {#if post.nsfw && !nsfwEnabled}
+                <div
+                  class="absolute inset-0 backdrop-blur-lg z-20 flex items-center justify-center flex-col text-lg font-bold"
+                >
+                  NSFW
+                </div>
+              {/if}
+              <div class="absolute inset-0 bg-neutral-200 dark:bg-neutral-800" />
+              {#if isPostInView}
+                {#if post.media?.reddit_video}
+                  <video src={post.media.reddit_video.fallback_url} class="media" autoplay loop muted />
+                {:else if post.preview?.reddit_video_preview}
+                  <video src={post.preview.reddit_video_preview.fallback_url} class="media" autoplay loop muted />
+                {:else if post.preview?.images[0]}
+                  <img
+                    src={findBestFittingImageUrl(
+                      post.preview.images[0].resolutions,
+                      document.querySelector('.media-container').clientWidth
+                    )}
+                    alt={post.title}
+                    class="media"
+                    on:error={() => {
+                      console.log('error', post.url);
+                      errored = [...errored, post.id];
+                    }}
+                  />
+                {/if}
+              {/if}
+            </a>
+          {/if}
+        </div>
+      {/each}
+    </div>
 
-  {#if i != data.children.length - 1}
-    <div class="my-5 flex items-center gap-4">
-      <hr class="w-full" />
-      <div class="text-center shrink-0">Page {i + 1}</div>
-      <hr class="w-full" />
+    {#if i != data.children.length - 1}
+      <div class="my-5 flex items-center gap-4">
+        <hr class="w-full" />
+        <div class="text-center shrink-0">Page {i + 1}</div>
+        <hr class="w-full" />
+      </div>
+    {/if}
+  {/each}
+
+  {#if loading}
+    <div class="flex w-full justify-center my-5">
+      <Spinner />
     </div>
   {/if}
-{/each}
 
-{#if loading}
-  <div class="flex w-full justify-center my-5">
-    <svg
-      class="animate-spin h-5 w-5 dark:text-white text-black"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-      <path
-        class="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      />
-    </svg>
-  </div>
-{/if}
-
-{#if outOfPosts || postCount == 0}
-  <div class="flex w-full justify-center my-5 text-lg">No more posts</div>
+  {#if outOfPosts || postCount == 0}
+    <div class="flex w-full justify-center my-5 text-lg">No more posts</div>
+  {/if}
 {/if}
 
 <style>
   .media {
     @apply w-full mb-4 absolute inset-0 z-10;
+  }
+
+  .media-container {
+    @apply break-inside-avoid;
   }
 </style>

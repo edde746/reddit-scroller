@@ -3,7 +3,8 @@
   import type { PageData } from './$types';
   import Subreddit from './subreddit.svg';
   import Header from '$lib/Header.svelte';
-  import { page } from '$app/stores';
+  import { navigating, page } from '$app/stores';
+  import Spinner from '$lib/Spinner.svelte';
 
   export let data: PageData;
   const filters = { curated: 'Curated', sfw: 'SFW', all: 'All', nsfw: 'NSFW' };
@@ -30,6 +31,7 @@
     'atbge',
     'videos',
     'thatsinsane',
+    'mademesmile',
   ];
 
   $: filtered = data.subreddits.filter((sub) => {
@@ -85,21 +87,27 @@
 </div>
 <p class="text-center mb-12">Showing {Math.min(filtered.length, 150 * pageN)} of {filtered.length} subreddits</p>
 
-<div class="grid gap-1 subreddits">
-  {#each filtered.slice(0, 150 * pageN) as subreddit}
-    <a href={subreddit.href}>
-      <img
-        src={subreddit.icon == '' ? Subreddit : subreddit.icon}
-        alt={subreddit.name + ' icon'}
-        class:dark:invert={subreddit.icon == ''}
-        loading="lazy"
-      />
-      <p class="">r/{subreddit.name}</p>
-      <span>({numberFormatter.format(subreddit.subscribers)} subscribers)</span>
-      <div class="ml-auto">&rarr;</div>
-    </a>
-  {/each}
-</div>
+{#if $navigating}
+  <div class="flex w-full justify-center my-5">
+    <Spinner />
+  </div>
+{:else}
+  <div class="grid gap-1 subreddits">
+    {#each filtered.slice(0, 150 * pageN) as subreddit}
+      <a href={subreddit.href}>
+        <img
+          src={subreddit.icon == '' ? Subreddit : subreddit.icon}
+          alt={subreddit.name + ' icon'}
+          class:dark:invert={subreddit.icon == ''}
+          loading="lazy"
+        />
+        <p class="">r/{subreddit.name}</p>
+        <span>({numberFormatter.format(subreddit.subscribers)} subscribers)</span>
+        <div class="ml-auto">&rarr;</div>
+      </a>
+    {/each}
+  </div>
+{/if}
 
 <style>
   .subreddits > a {
