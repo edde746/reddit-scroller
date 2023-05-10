@@ -28,6 +28,7 @@
   },
   "type": "module",
   "dependencies": {
+    "ioredis": "^5.3.2",
     "svelte-inview": "^4.0.0"
   }
 }

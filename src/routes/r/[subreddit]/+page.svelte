@@ -1,9 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import Header from '$lib/Header.svelte';
+  import Sorting from '$lib/Sorting.svelte';
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
   import { inview } from 'svelte-inview';
+  import Header from '$lib/Header.svelte';
 
   export let data: PageData;
 
@@ -31,7 +32,7 @@
       const params = Object.fromEntries(data.params);
       params.after = data.after;
 
-      fetch(`/r/${$page.params.subreddit}/.json?${new URLSearchParams(params)}`)
+      fetch(`/r/${$page.params.subreddit}/json?${new URLSearchParams(params)}`)
         .then((res) => res.json())
         .then((res) => {
           data.children = [...data.children, ...res.children];
@@ -43,10 +44,17 @@
 />
 
 <svelte:head>
-  <title>r/{$page.params.subreddit}</title>
+  <title>r/{$page.params.subreddit} - rscroll.app</title>
+  <meta
+    name="description"
+    content="Discover the latest memes, pictures, videos, and more from r/{$page.params
+      .subreddit} with rscroll.app, an infinite Reddit scroll viewer."
+  />
 </svelte:head>
 
-<Header title="r/{$page.params.subreddit}" />
+<Header title="r/{$page.params.subreddit}">
+  <Sorting />
+</Header>
 
 {#each data.children as page, i}
   <div class="columns-3 gap-4">
@@ -65,7 +73,7 @@
         }}
       >
         {#if firstImage && post.url && !errored.includes(post.id)}
-          {@const extension = post.url.split('.').pop()}
+          {@const extension = post.url.split('.').pop().split('?')[0].toLowerCase()}
           <a
             class="w-full mb-4 relative block"
             style="aspect-ratio: {firstImage.width}/{firstImage.height}"
@@ -74,7 +82,7 @@
               if (post.nsfw && !nsfwEnabled) {
                 nsfwEnabled = confirm('Do you wish to enable NSFW content?');
                 localStorage.setItem('nsfw', String(nsfwEnabled));
-                if (!nsfwEnabled) e.preventDefault();
+                e.preventDefault();
               }
             }}
             target="_blank"
@@ -97,7 +105,10 @@
                   src={post.url}
                   alt={post.title}
                   class="w-full mb-4 absolute inset-0 z-10"
-                  on:error={() => (errored = [...errored, post.id])}
+                  on:error={() => {
+                    console.log('error', post.url);
+                    errored = [...errored, post.id];
+                  }}
                 />
               {/if}
             {/if}
