@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { navigating, page } from '$app/stores';
   import Sorting from '$lib/Sorting.svelte';
   import { onMount } from 'svelte';
   import type { PageData } from './$types';
@@ -40,6 +40,14 @@
 
     return he.decode(bestFit ? bestFit.url : imageVariations[imageVariations.length - 1].url);
   };
+
+  $: $navigating &&
+    (() => {
+      postsInView = [];
+      errored = [];
+      loading = false;
+      outOfPosts = false;
+    })();
 </script>
 
 <svelte:window
@@ -77,7 +85,7 @@
 </Header>
 
 {#each data.children as page, i}
-  <div class="columns-3 gap-4">
+  <div class="md:columns-2 lg:columns-3 gap-4">
     {#each page as post}
       {@const firstImage = post.preview?.images[0]?.source}
       {@const isPostInView = postsInView.includes(post.id)}

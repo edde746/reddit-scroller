@@ -29,6 +29,7 @@
     'art',
     'atbge',
     'videos',
+    'thatsinsane',
   ];
 
   $: filtered = data.subreddits.filter((sub) => {
@@ -115,17 +116,5 @@
 
   .subreddits > a > span {
     @apply text-sm text-neutral-500 dark:text-neutral-400;
-  }
-
-  .segmented-control {
-    @apply flex gap-1 rounded-lg mx-auto dark:bg-neutral-800 bg-neutral-100 w-max px-3 py-2;
-  }
-
-  .segmented-control > a {
-    @apply flex-1 rounded-lg py-1 px-2 text-sm font-medium text-neutral-700 dark:text-neutral-200;
-  }
-
-  .segmented-control > a.active {
-    @apply bg-white dark:bg-neutral-700;
   }
 </style>
