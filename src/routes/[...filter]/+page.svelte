@@ -102,7 +102,7 @@
 
 <style>
   .subreddits > a {
-    @apply flex gap-2 items-center hover:dark:bg-neutral-800/50 hover:bg-neutral-200 px-3 py-2 rounded-lg;
+    @apply flex gap-2 items-center hover:dark:bg-neutral-800/50 hover:bg-neutral-100 px-3 py-2 rounded-lg;
   }
 
   .subreddits > a > img {
