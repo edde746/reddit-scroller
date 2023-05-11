@@ -2,14 +2,6 @@ import redis from '$lib/server/redis';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-interface Subreddit {
-  name: string;
-  icon: string;
-  href: string;
-  subscribers: number;
-  nsfw: boolean;
-}
-
 export const load: PageServerLoad = async () => {
   const cached = await redis.get('subreddits');
   if (cached) return JSON.parse(cached) as { subreddits: Subreddit[] };

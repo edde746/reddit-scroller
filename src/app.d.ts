@@ -8,10 +8,22 @@ declare global {
     // interface Platform {}
   }
 
+  interface Subreddit {
+    name: string;
+    icon: string;
+    href: string;
+    subscribers: number;
+    nsfw: boolean;
+  }
+
   namespace NodeJS {
     interface ProcessEnv {
       REDIS_URL: string;
     }
+  }
+
+  interface Window {
+    dataLayer: any[];
   }
 }
 
