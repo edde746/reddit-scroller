@@ -30,7 +30,6 @@
   },
   "type": "module",
   "dependencies": {
-    "@edde746/svelte-masonry": "^0.0.6",
     "he": "^1.2.0",
     "ioredis": "^5.3.2",
     "svelte-inview": "^4.0.0"
