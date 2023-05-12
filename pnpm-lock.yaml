@@ -1,6 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  '@edde746/svelte-masonry':
+    specifier: ^0.0.6
+    version: 0.0.6(svelte@3.54.0)
   he:
     specifier: ^1.2.0
     version: 1.2.0
@@ -69,6 +72,14 @@ packages:
   /@cloudflare/workers-types@4.20230419.0:
     resolution: {integrity: sha512-MfNBlHrI/ekRkbLtdAo23D4hkXF+3QD92OCwuXxCUK73HtMHuBqkMp9T/8KFbKNRCnz7PzUderc7Jr5m3eeW3g==}
     dev: true
+
+  /@edde746/svelte-masonry@0.0.6(svelte@3.54.0):
+    resolution: {integrity: sha512-lS9C46J/AQjRKwCiEwJph9BOXVR9k4GBd5rZtc6ZE05xni/4ie/N3+wTVVFJAwRkonVxzzAdGZNhSx81S6SQDw==}
+    peerDependencies:
+      svelte: ^3.54.0
+    dependencies:
+      svelte: 3.54.0
+    dev: false
 
   /@esbuild/android-arm64@0.17.18:
     resolution: {integrity: sha512-/iq0aK0eeHgSC3z55ucMAHO05OIqmQehiGay8eP5l/5l+iEr4EIbh4/MI8xD9qRFjqzgkc0JkX0LculNC9mXBw==}
