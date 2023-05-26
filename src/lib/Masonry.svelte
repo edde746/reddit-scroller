@@ -21,7 +21,10 @@
     }
 
     for (; orderedUntil < items.length; orderedUntil++) {
-      const minColIndex = columns.findIndex((col) => col.height === Math.min(...columns.map((col) => col.height)));
+      const minColIndex = Math.max(
+        columns.findIndex((col) => col.height === Math.min(...columns.map((col) => col.height))),
+        0
+      );
       columns[minColIndex].items.push(orderedUntil);
       columns[minColIndex].height += Math.ceil(
         (items[orderedUntil].height / items[orderedUntil].width) * itemWidth + gap
