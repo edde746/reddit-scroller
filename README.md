@@ -2,6 +2,8 @@
 
 A smooth and user-friendly frontend for browsing Reddit media and subreddits, built using SvelteKit and Tailwind CSS.
 
+> Mostly dead due to Reddits API changes, can still be ran locally (sometimes).
+
 ## Features
 
 - Browse media content from Reddit, including images, GIFs, and videos.
